@@ -1,3 +1,8 @@
+# =========================================================
+# NAIL STUDIO BOT
+# PREMIUM NAIL BOT
+# =========================================================
+
 import asyncio
 import logging
 
@@ -11,7 +16,8 @@ from aiogram.types import (
     InlineKeyboardButton,
     ReplyKeyboardMarkup,
     KeyboardButton,
-    CallbackQuery
+    CallbackQuery,
+    FSInputFile
 )
 
 from aiogram.client.default import DefaultBotProperties
@@ -35,15 +41,19 @@ ADMIN_IDS = [
 # BRAND
 # =========================================================
 
-BRAND_NAME = "NAIL STUDIO"
-
-INSTAGRAM = "https://instagram.com/your_inst"
+MASTER_USERNAME = "your_username"
 
 PORTFOLIO = "https://t.me/your_channel"
 
-MASTER_USERNAME = "your_username"
+# =========================================================
+# PHOTOS
+# =========================================================
 
-ADDRESS = "Москва"
+WELCOME_PHOTO = "welcome.jpg"
+SERVICES_PHOTO = "services.jpg"
+PORTFOLIO_PHOTO = "portfolio.jpg"
+PRICE_PHOTO = "price.jpg"
+CONTACTS_PHOTO = "contacts.jpg"
 
 # =========================================================
 # LOGGING
@@ -124,8 +134,7 @@ def main_menu():
             ]
         ],
 
-        resize_keyboard=True,
-        input_field_placeholder="Выберите действие..."
+        resize_keyboard=True
     )
 
 # =========================================================
@@ -192,23 +201,10 @@ def booking_keyboard(service_key):
 @dp.message(Command("start"))
 async def start(message: Message):
 
-    text = (
+    photo = FSInputFile(WELCOME_PHOTO)
 
-        f"💖 <b>{BRAND_NAME}</b>\n\n"
-
-        "Добро пожаловать в студию "
-        "красивых ногтей ✨\n\n"
-
-        "У нас вы можете:\n"
-        "• сделать маникюр\n"
-        "• покрытие гель-лаком\n"
-        "• заказать nail design\n\n"
-
-        "Выберите действие ниже 👇"
-    )
-
-    await message.answer(
-        text,
+    await message.answer_photo(
+        photo=photo,
         reply_markup=main_menu()
     )
 
@@ -219,19 +215,10 @@ async def start(message: Message):
 @dp.message(F.text == "💅 Услуги")
 async def services(message: Message):
 
-    text = (
+    photo = FSInputFile(SERVICES_PHOTO)
 
-        "💅 <b>Наши услуги</b>\n\n"
-
-        "✨ Классический маникюр\n"
-        "✨ Гель-лак\n"
-        "✨ Nail Design\n\n"
-
-        "Выберите услугу ниже 👇"
-    )
-
-    await message.answer(
-        text,
+    await message.answer_photo(
+        photo=photo,
         reply_markup=services_keyboard()
     )
 
@@ -242,16 +229,11 @@ async def services(message: Message):
 @dp.message(F.text == "💰 Прайс")
 async def prices(message: Message):
 
-    text = (
+    photo = FSInputFile(PRICE_PHOTO)
 
-        "💰 <b>Прайс-лист</b>\n\n"
-
-        "💅 Классический маникюр — 1500₽\n"
-        "✨ Маникюр + гель-лак — 2500₽\n"
-        "🎨 Дизайн ногтей — 3000₽"
+    await message.answer_photo(
+        photo=photo
     )
-
-    await message.answer(text)
 
 # =========================================================
 # PORTFOLIO
@@ -259,6 +241,8 @@ async def prices(message: Message):
 
 @dp.message(F.text == "🖼 Портфолио")
 async def portfolio(message: Message):
+
+    photo = FSInputFile(PORTFOLIO_PHOTO)
 
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
@@ -271,8 +255,8 @@ async def portfolio(message: Message):
         ]
     )
 
-    await message.answer(
-        "🖼 <b>Портфолио мастера</b>",
+    await message.answer_photo(
+        photo=photo,
         reply_markup=keyboard
     )
 
@@ -283,18 +267,11 @@ async def portfolio(message: Message):
 @dp.message(F.text == "📞 Контакты")
 async def contacts(message: Message):
 
-    text = (
+    photo = FSInputFile(CONTACTS_PHOTO)
 
-        "📞 <b>Контакты</b>\n\n"
-
-        f"📍 Адрес: {ADDRESS}\n\n"
-
-        f"Instagram:\n{INSTAGRAM}\n\n"
-
-        f"Мастер:\n@{MASTER_USERNAME}"
+    await message.answer_photo(
+        photo=photo
     )
-
-    await message.answer(text)
 
 # =========================================================
 # SERVICE SELECT
@@ -362,7 +339,7 @@ async def booking_confirm(call: CallbackQuery):
     )
 
     # =====================================================
-    # SEND TO ALL ADMINS
+    # SEND TO ADMINS
     # =====================================================
 
     for admin_id in ADMIN_IDS:
